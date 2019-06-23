@@ -26,7 +26,13 @@ class ProductController extends Controller
    		
    		}
 
-   		return $CategoryData;
+   		$dataR=array();
+   		foreach ($CategoryData as $key => $value) {
+   			# code...
+   			array_push($dataR, $value);
+   		}
+
+   		return $dataR;
 	}
 	// get all Products 
 	public function all()
@@ -35,14 +41,10 @@ class ProductController extends Controller
     				->join('Categories','ProductCategory.category_id','=','Categories.id')
     				->select('Products.*','Categories.name as cat_name')->get();
    		 
-   		$CategoryData = $this->commonLogic($products);
-   		$dataR=array();
-   		foreach ($CategoryData as $key => $value) {
-   			# code...
-   			array_push($dataR, $value);
-   		}
+   		$dataR = $this->commonLogic($products);
    		
-        return response()->json($dataR,200);
+   		
+        return response()->json(array('Products' =>$dataR),200);
     }
 
 	// get Product by id 
@@ -54,10 +56,9 @@ class ProductController extends Controller
     				->where('Products.id','=',$id)
     				->get();
    		 
-   		$CategoryData = $this->commonLogic($products);
+   		$dataR = $this->commonLogic($products);
 
-   		
-        return response()->json($CategoryData,200);
+        return response()->json(array('Products' =>$dataR),200);
     }
 
     // POST data into database
@@ -90,9 +91,9 @@ class ProductController extends Controller
     				->where('Categories.id','=',$id)
     				->select('Products.*','Categories.name as cat_name')->get();
    		 
-   		$CategoryData = $this->commonLogic($products);
+   		$dataR = $this->commonLogic($products);
 
-        return response()->json($CategoryData,200);
+        return response()->json(array('Products' =>$dataR),200);
     }
     
 }
