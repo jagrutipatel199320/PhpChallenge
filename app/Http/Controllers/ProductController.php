@@ -11,84 +11,78 @@ class ProductController extends Controller
 
 	public function all()
     {
-        return response()->json(Products::get(),200);
+    	$products = Products::join('ProductCategory','ProductCategory.product_id','=','Products.id')
+    				->join('Categories','ProductCategory.category_id','=','Categories.id')
+    				->select('Products.*','Categories.name as cat_name')->get();
+   		 
+   		$data =$products->toArray();
+   		$responceData=array();
+   		
+   		foreach ($data as $key => $value) {
+   			$responceData[$value['id']][] = $value['cat_name'];
+   		}
+   		$CategoryData=array();
+   		foreach ($data as $key => $value) {
+   			
+   			$CategoryData[$value['id']]['name'] = $value['name'];
+   			$CategoryData[$value['id']]['sku'] = $value['SKU'];
+   			$CategoryData[$value['id']]['price'] = $value['price'];
+   			$CategoryData[$value['id']]['category']=implode(',', $responceData[$value['id']]);
+   		
+   		}
+   		
+        return response()->json($CategoryData,200);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    public function index()
+    public function getProduct($id)
     {
-        //
+    	$products = Products::join('ProductCategory','ProductCategory.product_id','=','Products.id')
+    				->join('Categories','ProductCategory.category_id','=','Categories.id')
+    				->select('Products.*','Categories.name as cat_name')
+    				->where('Products.id','=',$id)
+    				->get();
+   		 
+   		$data =$products->toArray();
+   		$responceData=array();
+   		
+   		foreach ($data as $key => $value) {
+   			$responceData[$value['id']][] = $value['cat_name'];
+   		}
+   		$CategoryData=array();
+   		foreach ($data as $key => $value) {
+   			
+   			$CategoryData[$value['id']]['name'] = $value['name'];
+   			$CategoryData[$value['id']]['sku'] = $value['SKU'];
+   			$CategoryData[$value['id']]['price'] = $value['price'];
+   			$CategoryData[$value['id']]['category']=implode(',', $responceData[$value['id']]);
+   		
+   		}
+   		
+        return response()->json($CategoryData,200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+
+    public function createProduct(Request $request){
+    	print_r($request->name);
+    	$product = new Products();
+    	$product->name = $request->name;
+    	$product->SKU = $request->sku;
+    	$product->price = $request->price;
+    	$product->save();
+
+    	$msg = array("msg"=>"Successfully Inserted");
+        return response()->json($msg,200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function deleteProduct($id)
     {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+    	 Products::where('Products.id','=',$id)->delete();
+   		 
+   		
+         $msg = array("msg"=>"Successfully Deleted");
+        return response()->json($msg,200);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    
 }

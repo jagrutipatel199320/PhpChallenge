@@ -22,6 +22,7 @@ class Products extends Migration
 
          Schema::create('Products', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
             $table->string('SKU');
             $table->integer('price');
             $table->timestamps();
