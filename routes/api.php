@@ -22,3 +22,4 @@ Route::get('products','ProductController@all');
 Route::get('products/{id}','ProductController@getProduct');
 Route::post('products/create','ProductController@createProduct');
 Route::delete('products/{id}','ProductController@deleteProduct');
+Route::get('products/category/{id}','ProductController@getProductByCategory');
