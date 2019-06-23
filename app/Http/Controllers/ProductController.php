@@ -8,14 +8,9 @@ use App\Products;
 
 class ProductController extends Controller
 {
-	// get all Products 
-	public function all()
-    {
-    	$products = Products::join('ProductCategory','ProductCategory.product_id','=','Products.id')
-    				->join('Categories','ProductCategory.category_id','=','Categories.id')
-    				->select('Products.*','Categories.name as cat_name')->get();
-   		 
-   		$data =$products->toArray();
+
+	public function commonLogic($products){
+		$data =$products->toArray();
    		$responceData=array();
    		
    		foreach ($data as $key => $value) {
@@ -30,6 +25,17 @@ class ProductController extends Controller
    			$CategoryData[$value['id']]['category']=implode(',', $responceData[$value['id']]);
    		
    		}
+
+   		return $CategoryData;
+	}
+	// get all Products 
+	public function all()
+    {
+    	$products = Products::join('ProductCategory','ProductCategory.product_id','=','Products.id')
+    				->join('Categories','ProductCategory.category_id','=','Categories.id')
+    				->select('Products.*','Categories.name as cat_name')->get();
+   		 
+   		$CategoryData = $this->commonLogic($products);
    		$dataR=array();
    		foreach ($CategoryData as $key => $value) {
    			# code...
@@ -48,28 +54,14 @@ class ProductController extends Controller
     				->where('Products.id','=',$id)
     				->get();
    		 
-   		$data =$products->toArray();
-   		$responceData=array();
-   		
-   		foreach ($data as $key => $value) {
-   			$responceData[$value['id']][] = $value['cat_name'];
-   		}
-   		$CategoryData=array();
-   		foreach ($data as $key => $value) {
-   			
-   			$CategoryData[$value['id']]['name'] = $value['name'];
-   			$CategoryData[$value['id']]['sku'] = $value['SKU'];
-   			$CategoryData[$value['id']]['price'] = $value['price'];
-   			$CategoryData[$value['id']]['category']=implode(',', $responceData[$value['id']]);
-   		
-   		}
+   		$CategoryData = $this->commonLogic($products);
+
    		
         return response()->json($CategoryData,200);
     }
 
     // POST data into database
     public function createProduct(Request $request){
-		
 
        	$product = new Products();
     	$product->name = $request->name;
@@ -84,11 +76,9 @@ class ProductController extends Controller
     public function deleteProduct($id)
     {
 
-    	 Products::where('Products.id','=',$id)->delete();
-   		 
-   		
+    	 Products::where('Products.id','=',$id)->delete();   		
          $msg = array("msg"=>"Successfully Deleted");
-        return response()->json($msg,200);
+         return response()->json($msg,200);
 
     }
 
@@ -100,22 +90,8 @@ class ProductController extends Controller
     				->where('Categories.id','=',$id)
     				->select('Products.*','Categories.name as cat_name')->get();
    		 
-   		$data =$products->toArray();
-   		$responceData=array();
-   		
-   		foreach ($data as $key => $value) {
-   			$responceData[$value['id']][] = $value['cat_name'];
-   		}
-   		$CategoryData=array();
-   		foreach ($data as $key => $value) {
-   			
-   			$CategoryData[$value['id']]['name'] = $value['name'];
-   			$CategoryData[$value['id']]['sku'] = $value['SKU'];
-   			$CategoryData[$value['id']]['price'] = $value['price'];
-   			$CategoryData[$value['id']]['category']=implode(',', $responceData[$value['id']]);
-   		
-   		}
-   		
+   		$CategoryData = $this->commonLogic($products);
+
         return response()->json($CategoryData,200);
     }
     
